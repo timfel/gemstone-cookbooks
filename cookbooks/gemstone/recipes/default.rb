@@ -111,49 +111,44 @@ remote_directory "/opt/gemstone" do
   files_owner   username
 end
 
-zip_filename = "GemStone64Bit#{node[:gemstone][:version]}-#{node[:gemstone][:platform]}"
+zip_filename = node[:gemstone][:filename]
 
 bash "Download GemStone" do
   cwd "/opt/gemstone"
-  code "wget ftp://ftp.gemstone.com/pub/GemStone64/#{node[:gemstone][:version]}/#{zip_filename}.zip"
-  not_if "[ -e /opt/gemstone/#{zip_filename}.zip ]"
+  code "wget #{node[:gemstone][:url]}/#{node[:gemstone][:filename]}.tar.gz"
+  not_if "[ -e /opt/gemstone/#{node[:gemstone][:filename]}.tar.gz ]"
 end
-
-# Download extent that has Seaside30 loaded
-bash "Download Seaside30 extent" do
-  extent_name = "extent0.dbf"
-  # Hosted on JohnnyT's rackspace account - has Seaside30 loaded
-  remote_file = "http://c0084442.cdn2.cloudfiles.rackspacecloud.com/#{extent_name}"
-
-  cwd "/opt/gemstone"
-  code <<-CODE
-    wget #{remote_file}
-  CODE
-    # cp seaside.dbf data/extent0.dbf
-  not_if "[ -e /opt/gemstone/#{extent_name} ]"
-end
-
 
 bash "Install GemStone" do
   cwd "/opt/gemstone"
   code <<-EOH
-    unzip #{zip_filename}.zip
-    ln -s #{zip_filename} product
-    mkdir -p data etc locks log www/glass1 www/glass2 www/glass3
+    tar xzf #{node[:gemstone][:filename]}.tar.gz
+    ln -s #{node[:gemstone][:filename]} productcp product/data/system.conf etc/
+    mkdir -p data etc locks sys log www/glass1 www/glass2 www/glass3
     cp product/data/system.conf etc/
     cp product/seaside/etc/gemstone.key etc/
     cp product/seaside/etc/gemstone.key sys/
-    cp extent0.dbf data/extent0.dbf
+    cp product/bin/extent0.ruby.dbf data/extent0.dbf
+    ln -s /opt/gemstone/product/bin/topaz /usr/local/bin/topaz
     touch log/seaside.log
+    chmod +w data/extent0.dbf
     chmod ug+rw log/*
-    chmod 600 data/extent0.dbf
-    chown -R #{username}:#{username} .
+    chown -R #{username}: #{username} .
   EOH
-    # cp product/bin/extent0.seaside.dbf data/extent0.dbf
 
   not_if "[ -e /opt/gemstone/data/extent0.dbf ]"
 end
 
+
+bash "Setup topaz" do
+  cwd "/opt/gemstone/product/lib/"
+  code <<-EOH
+    for i in *; do ln -s $(pwd)/$i ../bin/$i; done
+    ln -s /opt/gemstone/product/bin/topaz /usr/local/bin/topaz
+  EOH
+
+  not_if "[ -e /usr/local/bin/topaz ]"
+end
 
 # These get runSeasideGems30 working
 %w[ runSeasideGems30 startSeaside30_Adaptor ].each do |filename|
@@ -173,23 +168,38 @@ template "/opt/gemstone/product/seaside/defSeaside" do
   group   username
 end
 
-# # NOTE: the server needs to be rebooted before running this
-# bash "Load lastest FastCGI" do
-#   code <<-CMD
-# topaz << EOF
-# run
-# 
-# Gofer new
-#     squeaksource: 'MetacelloRepository';
-#     package: 'ConfigurationOfSeaside30';
-#     load.
-# (Smalltalk at: #ConfigurationOfSeaside30) load.
-# 
-# 
-# %
-# commit
-# logout
-# exit
-# EOF
-#   CMD
-# end
+# NOTE: the server needs to be rebooted before running this
+# So, on first run, we only touch a marker file.
+bash "Load lastest FastCGI" do
+  cwd "/opt/gemstone/product/bin"
+  code <<-CMD
+if [[ ! -e /opt/gemstone/reboot_done ]]; then
+  touch /opt/gemstone/reboot_done
+else
+topaz << EOF
+run
+
+
+ConfigurationOfGLASS updateServer.
+
+Gofer new
+    squeaksource: 'Seaside30';
+    package: 'ConfigurationOfSeaside30';
+    package: 'ConfigurationOfGrease';
+    load.
+
+GsDeployer deploy: [
+    Gofer project load: 'Seaside30' version: '3.0.3.1' group: 'ALL'.
+]
+
+
+%
+commit
+logout
+exit
+EOF
+touch /opt/gemstone/seaside_was_installed
+fi
+  CMD
+  not_if "[ -e /opt/gemstone/seaside_was_installed ]"
+end
