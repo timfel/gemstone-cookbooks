@@ -12,10 +12,10 @@ gemtools_file = node[:gemstone][:gemtools]
 # gemtools_file = "GemTools-2.4.4.3.app"
 
 bash "Download GemTools" do
-  remote_file = "http://seaside.gemstone.com/squeak/#{gemtools_file}.zip"
+  # remote_file = "http://seaside.gemstone.com/squeak/#{gemtools_file}.zip"
 
   # Hosted on JohnnyT's rackspace account - has Seaside30 loaded
-  # remote_file = "http://c0084442.cdn2.cloudfiles.rackspacecloud.com/#{gemtools_file}.zip"
+  remote_file = "http://myhpi.de/~tim.felgentreff/#{gemtools_file}.zip"
 
   cwd "/opt/gemstone"
   code "wget #{remote_file}"
