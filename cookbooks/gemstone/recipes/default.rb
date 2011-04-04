@@ -189,11 +189,16 @@ Gofer new
     package: 'ConfigurationOfMagritte2';
     load.
 
+%
+commit
+run
+
 MCPlatformSupport commitOnAlmostOutOfMemoryDuring: [
-    ConfigurationOfSeaside30 project latestVersion
-        load: #('Core' 'Seaside-Adaptors-Comanche' 'Seaside-Adaptors-Swazoo').
-    ConfigurationOfMagritte2 project latestVersion
-        load: #('Magritte-Seaside').
+    (ConfigurationOfSeaside30 project version: '3.0.3')
+        load: {'Core'};
+        load: {'Seaside-Adaptors-Swazoo'}.
+    ConfigurationOfMagritte2 project lastVersion
+        load: { 'Magritte-Seaside' }.
 ].
 
 %
