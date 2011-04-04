@@ -16,6 +16,7 @@
   "default_attributes": {
     "accounts": {
       "glass": {
+        "password": "glass",
         "keys": [
           {
             "name": "YOUR_USERNAME",
