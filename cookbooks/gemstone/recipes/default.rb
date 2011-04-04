@@ -119,19 +119,19 @@ bash "Download GemStone" do
   not_if "[ -e /opt/gemstone/#{zip_filename}.zip ]"
 end
 
-# Download extent that has Seaside30 loaded
-bash "Download Seaside30 extent" do
-  extent_name = "extent0.dbf"
-  # Hosted on JohnnyT's rackspace account - has Seaside30 loaded
-  remote_file = "http://c0084442.cdn2.cloudfiles.rackspacecloud.com/#{extent_name}"
+# # Download extent that has Seaside30 loaded
+# bash "Download Seaside30 extent" do
+#   extent_name = "extent0.dbf"
+#   # Hosted on JohnnyT's rackspace account - has Seaside30 loaded
+#   remote_file = "http://c0084442.cdn2.cloudfiles.rackspacecloud.com/#{extent_name}"
 
-  cwd "/opt/gemstone"
-  code <<-CODE
-    wget #{remote_file}
-  CODE
-    # cp seaside.dbf data/extent0.dbf
-  not_if "[ -e /opt/gemstone/#{extent_name} ]"
-end
+#   cwd "/opt/gemstone"
+#   code <<-CODE
+#     wget #{remote_file}
+#   CODE
+#     # cp seaside.dbf data/extent0.dbf
+#   not_if "[ -e /opt/gemstone/#{extent_name} ]"
+# end
 
 
 bash "Install GemStone" do
@@ -143,13 +143,12 @@ bash "Install GemStone" do
     cp product/data/system.conf etc/
     cp product/seaside/etc/gemstone.key etc/
     cp product/seaside/etc/gemstone.key sys/
-    cp extent0.dbf data/extent0.dbf
+    cp product/bin/extent0.seaside.dbf data/extent0.dbf
     touch log/seaside.log
     chmod ug+rw log/*
     chmod 600 data/extent0.dbf
     chown -R #{username}:#{username} .
   EOH
-    # cp product/bin/extent0.seaside.dbf data/extent0.dbf
 
   not_if "[ -e /opt/gemstone/data/extent0.dbf ]"
 end
@@ -174,22 +173,36 @@ template "/opt/gemstone/product/seaside/defSeaside" do
 end
 
 # # NOTE: the server needs to be rebooted before running this
-# bash "Load lastest FastCGI" do
-#   code <<-CMD
-# topaz << EOF
-# run
-# 
-# Gofer new
-#     squeaksource: 'MetacelloRepository';
-#     package: 'ConfigurationOfSeaside30';
-#     load.
-# (Smalltalk at: #ConfigurationOfSeaside30) load.
-# 
-# 
-# %
-# commit
-# logout
-# exit
-# EOF
-#   CMD
-# end
+# So, on first run, we only touch a marker file.
+bash "Load lastest FastCGI" do
+  cwd "/opt/gemstone/product/bin"
+  code <<-CMD
+if [[ ! -e /opt/gemstone/reboot_done ]]; then
+  touch /opt/gemstone/reboot_done
+else
+topaz << EOF
+run
+
+Gofer new
+    squeaksource: 'MetacelloRepository';
+    package: 'ConfigurationOfSeaside30';
+    package: 'ConfigurationOfMagritte2';
+    load.
+
+MCPlatformSupport commitOnAlmostOutOfMemoryDuring: [
+    ConfigurationOfSeaside30 project latestVersion
+        load: #('Core' 'Seaside-Adaptors-Comanche' 'Seaside-Adaptors-Swazoo').
+    ConfigurationOfMagritte2 project latestVersion
+        load: #('Magritte-Seaside').
+].
+
+%
+commit
+logout
+exit
+EOF
+touch /opt/gemstone/seaside_was_installed
+fi
+  CMD
+  not_if "[ -e /opt/gemstone/seaside_was_installed ]"
+end
