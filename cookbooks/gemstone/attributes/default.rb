@@ -1,4 +1,5 @@
 default[:gemstone][:user][:name]      = "glass"
+default[:gemstone][:user][:password]  = "glass"
 default[:gemstone][:user][:uid]       = "1001"
 default[:gemstone][:user][:home_dir]  = "/home/#{default[:user][:name]}"
 
