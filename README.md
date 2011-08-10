@@ -12,7 +12,6 @@ First - you need to have the following installed on your system:
 
 * Ruby
 * [Vagrant](http://vagrantup.com/)
-* A Lucid 64bit vagrant box named lucid64 ( vagrant box add base http://files.vagrantup.com/lucid64.box )
 
 Clone the project if you haven't already:
 
@@ -21,12 +20,12 @@ git clone https://github.com/johnnyt/gemstone-cookbooks.git
 </pre>**
 
 Then from the project root run the following command. This will try to update your RubyGems, install and
-run [Bundler](http://gembundler.com/), and copy example files. 
+run [Bundler](http://gembundler.com/).
 **<pre>
 rake setup
 </pre>**
 
-Now open up roles/gemstone.rb and copy your *public* ssh key (probably ~/.ssh/id_rsa.pub or ~/.ssh/id_dsa.up) into the file - about half way down.
+Now open up roles/gemstone.json and copy your *public* ssh key (probably ~/.ssh/id_rsa.pub or ~/.ssh/id_dsa.up) into the file - about half way down.
 
 You can check out Vagrantfile for information about the virtual-box. The code is mainly in the cookbooks/gemstone/recipes/ directory.
 Now if rake setup ran well - run the following to setup your vagrant box (this also reboots the box for some GemStone settings).
