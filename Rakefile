@@ -29,18 +29,6 @@ task :setup do
   puts colorize("-- Running bundle install", :blue)
   system "bundle install"
 
-  puts colorize("-- Copying example files", :blue)
-  %w[ roles/gemstone.json ].each do |filename|
-    path = File.expand_path(File.join(File.dirname(__FILE__), filename))
-
-    if File.exists?(path)
-      puts colorize("   Already exists: #{path}", :yellow)
-    else
-      puts colorize("   Creating #{path}", :green)
-      FileUtils.cp(path+".example", path)
-    end
-  end
-
   note = <<-NOTE
 
 

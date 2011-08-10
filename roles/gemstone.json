@@ -19,8 +19,8 @@
         "password": "glass",
         "keys": [
           {
-            "name": "YOUR_USERNAME",
-            "key": "ssh-rsa YOUR_KEY"
+            "name": "tfelgentreff",
+            "key": "ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAuN2OLNXYpqW0kao+rUZLiS5U4aCsxv9VtQVNrNN8njs8eSuMnySRdl9uNmdKGjaQf/vCRt6d9dmI+S31juC9YuoPo0WPJI6DthMU7ZRgGr4tIoxYEy0Q2wiZIMexpc5KnGjEC0z8fIyuOgkPM7QlhNZYeTvpD4iuroGi3/dMrurA5xq8UCtnc5Owkmlp2JifsoiIPHceR7kUawOGUPN2PugSGOLVp39NFSiDVafBomQvL+zr+tv1pn97XlMFeRTPi5cD9sAoiPPQhk19IP4WNoGfj4cz3koJliQChWkA+wJACrOyO4Rj0hWHm5K2aMc+sHxELCE/8+rnRhoWjanJpw== tfelgentreff@romania"
           }
         ]
       }
