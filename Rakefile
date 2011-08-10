@@ -1,6 +1,4 @@
 require 'rubygems'
-# require 'chef'
-# require 'json'
 
 def sudo
   "sudo" unless Gem.path.all? {|p| File.writable?(p) }
@@ -32,7 +30,7 @@ task :setup do
   system "bundle install"
 
   puts colorize("-- Copying example files", :blue)
-  %w[ Vagrantfile roles/gemstone.json ].each do |filename|
+  %w[ roles/gemstone.json ].each do |filename|
     path = File.expand_path(File.join(File.dirname(__FILE__), filename))
 
     if File.exists?(path)
@@ -71,7 +69,7 @@ task :va, :cmd do |t, args|
   system "bundle exec vagrant #{args.cmd}"
 end
 
-COLORS = { 
+COLORS = {
            :none     => "0",
            :black    => "30",
            :red      => "31",
@@ -81,7 +79,7 @@ COLORS = {
            :magenta  => "35",
            :cyan     => "36",
            :white    => "37"
-        } 
+        }
 
 ATTRIBUTES = {
           :none       => 0,
